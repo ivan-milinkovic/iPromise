@@ -6,21 +6,10 @@ lightweight, with no dependencies, and easy to integrate (just copy one file to 
 An example:
 
 ```swift
-    func fetch() -> IFuture<String, NSError> {
-        
-        let promise = IPromise<String, NSError>()
-        
-        let dt = dispatch_time(DISPATCH_TIME_NOW, 3 * Int64(NSEC_PER_SEC))
-        dispatch_after(dt, dispatch_get_main_queue(), {
-            promise.resolve("test")
-        })
-        
-        return promise.future
-    }
-    
+    // using iPromise API 
     func testPromise()
     {
-        let future = fetch()
+        let future = asyncFetchValue()
         
         future
         .onValue { (value) in
@@ -29,6 +18,18 @@ An example:
         .onError { (error) in
             print("got an error: \(error)")
         }
+    }
+    
+    // adapt a completion block based API to a future based
+    func asyncFetchValue() -> IFuture<String, NSError> {
+        
+        let promise = IPromise<String, NSError>()
+        
+        performAsyncTask(completion: { value in
+            promise.resolve(value)
+        })
+        
+        return promise.future
     }
 
 ```
