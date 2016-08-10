@@ -9,21 +9,31 @@ private enum IFutureResult<T,E> {
 }
 
 
-class IFuture <T, E> {
+public class IFuture <T, E> {
     
     private var result : IFutureResult<T, E>? = nil
     
-    typealias SuccessClosure = (value: T)->Void
-    typealias ErrorClosure = (error: E)->Void
+    private typealias SuccessClosure = (value: T)->Void
+    private typealias ErrorClosure = (error: E)->Void
     
     private var onValueClosures: [SuccessClosure] = []
     private var onErrorClosures: [ErrorClosure] = []
     
     // synchronization queue to serialize all execution to avoid race conditions
-    private var syncQueue : dispatch_queue_t = dispatch_get_main_queue()
+    private var syncQueue : dispatch_queue_t
     
+    public convenience init() {
+        self.init(synchronizationQueue: dispatch_get_main_queue())
+    }
     
-    func onValue(closure: (value: T)->Void) -> IFuture <T, E> {
+    /**
+     @param synchronizationQueue A dispatch queue used to synchronize execution on crutucal sections
+     */
+    public init(synchronizationQueue: dispatch_queue_t) {
+        self.syncQueue = synchronizationQueue
+    }
+    
+    public func onValue(closure: (value: T)->Void) -> IFuture <T, E> {
         
         performOnSyncQueue {
             
@@ -40,7 +50,7 @@ class IFuture <T, E> {
         return self
     }
     
-    func onError(closure: (error: E)->Void) -> IFuture <T, E> {
+    public func onError(closure: (error: E)->Void) -> IFuture <T, E> {
         
         performOnSyncQueue {
             
@@ -60,17 +70,20 @@ class IFuture <T, E> {
     private func resolve(value: T) {
         performOnSyncQueue {
             self.result = .Value(value)
-            self.runStoredCallbacks()
-            self.clearStoredCallbacks()
+            self.resolveCallbacks()
         }
     }
     
     private func resolve(error: E) {
         performOnSyncQueue {
             self.result = .Error(error)
-            self.runStoredCallbacks()
-            self.clearStoredCallbacks()
+            self.resolveCallbacks()
         }
+    }
+    
+    private func resolveCallbacks() {
+        self.runStoredCallbacks()
+        self.clearStoredCallbacks()
     }
     
     private func runStoredCallbacks() {
@@ -100,7 +113,7 @@ class IFuture <T, E> {
     }
     
     
-    func map <T2> (transform: (value: T)-> T2 ) -> IFuture<T2,E> {
+    public func map <T2> (transform: (value: T)-> T2 ) -> IFuture<T2,E> {
         
         let newFuture = IFuture<T2,E>()
         
@@ -123,19 +136,19 @@ class IFuture <T, E> {
 
 
 
-class IPromise<T,E> {
+public class IPromise<T,E> {
     
-    let future : IFuture<T,E>
+    public let future : IFuture<T,E>
     
-    init() {
+    public init() {
         future = IFuture<T,E>()
     }
     
-    func resolve(value: T) {
+    public func resolve(value: T) {
         future.resolve(value)
     }
     
-    func resolve(error: E) {
+    public func resolve(error: E) {
         future.resolve(error)
     }
     
