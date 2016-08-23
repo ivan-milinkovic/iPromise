@@ -38,10 +38,4 @@ An example:
 
 Just copy the IPromise.swift file to your project.
 
-:) 
-
-## TODO:
-
-Finish unit tests.
-
 ---
