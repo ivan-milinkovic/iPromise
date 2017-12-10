@@ -74,7 +74,7 @@ class AdHocTests {
         
         
         f2.map { (value) -> Int in
-            return value.characters.count
+            return value.count
         }
         .onValue { (value) in
             print("observer 4: " + value.description)
