@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct MyError : ErrorType, CustomStringConvertible {
+struct MyError : Error, CustomStringConvertible {
     
     let msg : String
     
@@ -20,10 +20,10 @@ class AdHocTests {
         
         let promise = IPromise<String, NSError>()
         
-        let dt = dispatch_time(DISPATCH_TIME_NOW, 3 * Int64(NSEC_PER_SEC))
-        dispatch_after(dt, dispatch_get_main_queue(), {
+        let dt = DispatchTime.now() + Double(3 * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC)
+        DispatchQueue.main.asyncAfter(deadline: dt, execute: {
             promise.resolve("test")
-//            promise.resolve(MyError(msg: "my error"))
+//            promise.resolve(MyError(msg: "my error")) // or try an error
         })
         
         return promise.future
@@ -49,27 +49,27 @@ class AdHocTests {
         let f = fetch()
         
         f.onValue { (value) in
-            print("obs 1: " + value)
+            print("observer 1: " + value)
         }.onError { (error) in
-            print("obs 1: " + error.description)
+            print("observer 1: " + error.description)
         }
         
         let f2 = f.map { (value) -> String in
             return value + value
         }
         .onValue { (value) in
-            print("obs 2: " + value)
+            print("observer 2: " + value)
             
-            let dt = dispatch_time(DISPATCH_TIME_NOW, 1500 * Int64(NSEC_PER_MSEC))
-            dispatch_after(dt, dispatch_get_main_queue(), {
+            let dt = DispatchTime.now() + Double(1500 * Int64(NSEC_PER_MSEC)) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: dt, execute: {
                 f.onValue({ (value) in
-                    print("obs 3: \(value)")
+                    print("observer 3: \(value)")
                 }).onError { (error) in
-                    print("obs 3: " + error.description)
+                    print("observer 3: " + error.description)
                 }
             })
         }.onError { (error) in
-            print("obs 2: " + error.description)
+            print("observer 2: " + error.description)
         }
         
         
@@ -77,9 +77,9 @@ class AdHocTests {
             return value.characters.count
         }
         .onValue { (value) in
-            print("obs 4: " + value.description)
+            print("observer 4: " + value.description)
         }.onError { (error) in
-            print("obs 4: " + error.description)
+            print("observer 4: " + error.description)
         }
     }
     

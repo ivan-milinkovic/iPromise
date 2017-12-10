@@ -4,42 +4,42 @@
 import Foundation
 
 private enum IFutureResult<T,E> {
-    case Value(T)
-    case Error(E)
+    case value(T)
+    case error(E)
 }
 
 
-public class IFuture <T, E> {
+open class IFuture <T, E> {
     
-    private var result : IFutureResult<T, E>? = nil
+    fileprivate var result : IFutureResult<T, E>? = nil
     
-    private typealias SuccessClosure = (value: T)->Void
-    private typealias ErrorClosure = (error: E)->Void
+    fileprivate typealias SuccessClosure = (_ value: T)->Void
+    fileprivate typealias ErrorClosure = (_ error: E)->Void
     
-    private var onValueClosures: [SuccessClosure] = []
-    private var onErrorClosures: [ErrorClosure] = []
+    fileprivate var onValueClosures: [SuccessClosure] = []
+    fileprivate var onErrorClosures: [ErrorClosure] = []
     
     // synchronization queue to serialize all execution to avoid race conditions
-    private var syncQueue : dispatch_queue_t
+    fileprivate var syncQueue : DispatchQueue
     
     public convenience init() {
-        self.init(synchronizationQueue: dispatch_get_main_queue())
+        self.init(synchronizationQueue: DispatchQueue.main)
     }
     
     /**
      @param synchronizationQueue A dispatch queue used to synchronize execution on crutucal sections
      */
-    public init(synchronizationQueue: dispatch_queue_t) {
+    public init(synchronizationQueue: DispatchQueue) {
         self.syncQueue = synchronizationQueue
     }
     
-    public func onValue(closure: (value: T)->Void) -> IFuture <T, E> {
+    @discardableResult open func onValue(_ closure: @escaping (_ value: T)->Void) -> IFuture <T, E> {
         
         performOnSyncQueue {
             
             if let result = self.result {
-                if case .Value(let val) = result {
-                    closure(value: val)
+                if case .value(let val) = result {
+                    closure(val)
                 }
             }
             else {
@@ -50,13 +50,13 @@ public class IFuture <T, E> {
         return self
     }
     
-    public func onError(closure: (error: E)->Void) -> IFuture <T, E> {
+    @discardableResult open func onError(_ closure: @escaping (_ error: E)->Void) -> IFuture <T, E> {
         
         performOnSyncQueue {
             
             if let result = self.result {
-                if case .Error(let err) = result {
-                    closure(error: err)
+                if case .error(let err) = result {
+                    closure(err)
                 }
             }
             else {
@@ -67,60 +67,60 @@ public class IFuture <T, E> {
         return self
     }
     
-    private func resolve(value: T) {
+    fileprivate func resolve(_ value: T) {
         performOnSyncQueue {
-            self.result = .Value(value)
+            self.result = .value(value)
             self.resolveCallbacks()
         }
     }
     
-    private func resolve(error: E) {
+    fileprivate func resolve(_ error: E) {
         performOnSyncQueue {
-            self.result = .Error(error)
+            self.result = .error(error)
             self.resolveCallbacks()
         }
     }
     
-    private func resolveCallbacks() {
+    fileprivate func resolveCallbacks() {
         self.runStoredCallbacks()
         self.clearStoredCallbacks()
     }
     
-    private func runStoredCallbacks() {
+    fileprivate func runStoredCallbacks() {
         
         assert(result != nil, "must be resolved")
         
         switch result! {
-        case .Value(let value):
+        case .value(let value):
             for c in onValueClosures {
-                c(value: value)
+                c(value)
             }
-        case .Error(let error):
+        case .error(let error):
             for c in onErrorClosures {
-                c(error: error)
+                c(error)
             }
         }
         
     }
     
-    private func clearStoredCallbacks () {
+    fileprivate func clearStoredCallbacks () {
         onValueClosures = []
         onErrorClosures = []
     }
     
-    private func performOnSyncQueue(closure: ()->Void) {
-        dispatch_async(syncQueue, closure)
+    fileprivate func performOnSyncQueue(_ closure: @escaping ()->Void) {
+        syncQueue.async(execute: closure)
     }
     
     
-    public func map <T2> (transform: (value: T)-> T2 ) -> IFuture<T2,E> {
+    open func map <T2> (_ transform: @escaping (_ value: T)-> T2 ) -> IFuture<T2,E> {
         
         let newFuture = IFuture<T2,E>()
         
         performOnSyncQueue {
             
             self.onValue { (value) in
-                let newVal = transform(value: value)
+                let newVal = transform(value)
                 newFuture.resolve(newVal)
             }
             
@@ -136,19 +136,19 @@ public class IFuture <T, E> {
 
 
 
-public class IPromise<T,E> {
+open class IPromise<T,E> {
     
-    public let future : IFuture<T,E>
+    open let future : IFuture<T,E>
     
     public init() {
         future = IFuture<T,E>()
     }
     
-    public func resolve(value: T) {
+    open func resolve(_ value: T) {
         future.resolve(value)
     }
     
-    public func resolve(error: E) {
+    open func resolve(_ error: E) {
         future.resolve(error)
     }
     

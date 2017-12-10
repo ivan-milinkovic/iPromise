@@ -34,12 +34,12 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = "test123"
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve(expected)
         }
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             self.receivedValue = value
             exp.fulfill()
@@ -54,9 +54,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedError)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             XCTAssertNotNil(self.receivedValue)
             XCTAssertNil(self.receivedError)
             XCTAssert(self.receivedValue == expected)
@@ -72,12 +72,12 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = self.createNsError()
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve(expected)
         }
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             self.receivedValue = value
             exp.fulfill()
@@ -92,9 +92,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedError)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             XCTAssertNil(self.receivedValue)
             XCTAssertNotNil(self.receivedError)
             XCTAssert(self.receivedError == expected)
@@ -112,8 +112,8 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = "test123"
         
         // asynchronously resolve the promise
-        let exp = self.expectationWithDescription("")
-        dispatch_async(dispatch_get_main_queue()) {
+        let exp = self.expectation(description: "")
+        DispatchQueue.main.async {
             
             promise.resolve(expected)
             
@@ -133,9 +133,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedValue)
         XCTAssertNil(self.receivedError)
         
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             
             XCTAssertNotNil(self.receivedValue)
             XCTAssertNil(self.receivedError)
@@ -155,8 +155,8 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = self.createNsError()
         
         // asynchronously resolve the promise
-        let exp = self.expectationWithDescription("")
-        dispatch_async(dispatch_get_main_queue()) {
+        let exp = self.expectation(description: "")
+        DispatchQueue.main.async {
             
             promise.resolve(expected)
             
@@ -176,9 +176,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedValue)
         XCTAssertNil(self.receivedError)
         
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             
             XCTAssertNil(self.receivedValue)
             XCTAssertNotNil(self.receivedError)
@@ -204,7 +204,7 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedError)
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             self.receivedValue = value
             exp.fulfill()
@@ -215,9 +215,9 @@ class IPromiseTestHostTests: XCTestCase {
         }
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!))")
             XCTAssertNotNil(self.receivedValue)
             XCTAssertNil(self.receivedError)
             XCTAssert(self.receivedValue == expected)
@@ -237,7 +237,7 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = "test123"
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve(expected)
         }
         
@@ -247,7 +247,7 @@ class IPromiseTestHostTests: XCTestCase {
         var reportedErr2 : TestErrorType? = nil
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             reportedVal1 = value
         }
@@ -271,9 +271,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(reportedErr2)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             
             XCTAssertNotNil(reportedVal1)
             XCTAssertNotNil(reportedVal2)
@@ -294,7 +294,7 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = self.createNsError()
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve(expected)
         }
         
@@ -304,7 +304,7 @@ class IPromiseTestHostTests: XCTestCase {
         var reportedErr2 : TestErrorType? = nil
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             reportedVal1 = value
             }
@@ -328,9 +328,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(reportedErr2)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             
             XCTAssertNil(reportedVal1)
             XCTAssertNil(reportedVal2)
@@ -351,14 +351,14 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = 123
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve("test123")
         }
         
         var reportedVal : Int = 0
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             self.receivedValue = value
             future.map({ (value) -> Int in
@@ -379,9 +379,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedError)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(1) { (error : NSError?) in
+        waitForExpectations(timeout: 1) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             XCTAssertNotNil(reportedVal)
             XCTAssertNil(self.receivedError)
             XCTAssert(reportedVal == expected)
@@ -399,14 +399,14 @@ class IPromiseTestHostTests: XCTestCase {
         let expected = self.createNsError()
         
         // asynchronously resolve the promise
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             promise.resolve(expected)
         }
         
         var reportedVal : Int? = nil
         
         // wait for value/error
-        let exp = self.expectationWithDescription("")
+        let exp = self.expectation(description: "")
         future.onValue { (value) in
             self.receivedValue = value
             exp.fulfill()
@@ -433,9 +433,9 @@ class IPromiseTestHostTests: XCTestCase {
         XCTAssertNil(self.receivedError)
         
         // assert the final outcome
-        waitForExpectationsWithTimeout(10) { (error : NSError?) in
+        waitForExpectations(timeout: 10) { (error : Error?) in
             
-            XCTAssertNil(error, "error: \(error)")
+            XCTAssertNil(error, "error: \(error!)")
             XCTAssertNil(reportedVal)
             XCTAssertNotNil(self.receivedError)
             XCTAssert(self.receivedError == expected)
