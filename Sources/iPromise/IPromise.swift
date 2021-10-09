@@ -138,7 +138,7 @@ open class IFuture <T, E> {
 
 open class IPromise<T,E> {
     
-    open let future : IFuture<T,E>
+    public let future : IFuture<T,E>
     
     public init() {
         future = IFuture<T,E>()

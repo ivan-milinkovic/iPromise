@@ -1,6 +1,6 @@
 # iPromise
 
-iPromise is a simple Promise/Future pattern implementation, created to be simple, 
+iPromise (a practice project) is a simple Promise/Future pattern implementation, created to be simple, 
 lightweight, with no dependencies, and easy to integrate (just copy one file to you project). It uses no locks, but utilizes GCD for synchronization.
 
 An example:
@@ -33,9 +33,3 @@ An example:
     }
 
 ```
-
-## Installation
-
-Just copy the IPromise.swift file to your project.
-
----

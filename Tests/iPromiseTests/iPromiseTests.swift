@@ -2,9 +2,9 @@
 //  Copyright © 2016 Ivan Milinkovic
 
 import XCTest
+import iPromise
 
-
-class IPromiseTestHostTests: XCTestCase {
+class IPromiseTests: XCTestCase {
     
     typealias TestValueType = String
     typealias TestErrorType = NSError
